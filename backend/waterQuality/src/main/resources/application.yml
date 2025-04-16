@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/waterquality
     username: postgres
-    password: yourpassword  # Change this!
+    password: test
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: update
