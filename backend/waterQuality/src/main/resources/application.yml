@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/waterquality
+    username: postgres
+    password: yourpassword  # Change this!
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate.ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+mqtt:
+  broker-url: tcp://broker.hivemq.com:1883
+  client-id: spring-mqtt-server
+  topic: sensors/#
