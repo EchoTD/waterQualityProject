@@ -15,7 +15,28 @@ public class SensorData {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	private String type;
+
 	private Double temperature;
+
+	@Column(updatable = false)
+	private LocalDateTime timestamp;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
 
 	public Double getTemperature() {
 		return temperature;
@@ -24,7 +45,4 @@ public class SensorData {
 	public void setTemperature(Double temperature) {
 		this.temperature = temperature;
 	}
-
-	@Column(updatable = false)
-	private LocalDateTime timestamp;
 }
