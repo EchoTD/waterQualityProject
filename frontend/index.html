@@ -1,81 +1,35 @@
+<!-- frontend/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sensor Data Plot</title>
-  <!-- Load Chart.js from a CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Water Quality App</title>
+  <style>
+    body { font-family: sans-serif; }
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 1em;
+      background: #f5f5f5;
+    }
+    .login-btn {
+      background: #0077cc;
+      color: white;
+      border: none;
+      padding: 0.6em 1.2em;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
-  <h1>Sensor Temperature Data</h1>
-  <canvas id="temperatureChart" width="800" height="400"></canvas>
-
-  <script>
-    let temperatureChart;
-    
-    // Function to initialize the chart with empty data
-    function createChart() {
-      const ctx = document.getElementById('temperatureChart').getContext('2d');
-      temperatureChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Temperature (°C)',
-            data: [],
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            fill: true,
-            tension: 0.1
-          }]
-        },
-        options: {
-          scales: {
-            x: {
-              title: { display: true, text: 'Time' },
-              ticks: { autoSkip: true, maxTicksLimit: 20 }
-            },
-            y: {
-              title: { display: true, text: 'Temperature (°C)' }
-            }
-          }
-        }
-      });
-    }
-    
-    // Function that fetches sensor data and updates the chart
-    async function updateChartData() {
-      try {
-        const response = await fetch('http://localhost:8080/api/sensor-data');
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const sensorData = await response.json();
-        
-        // Sort data by timestamp (optional, if not already sorted)
-        sensorData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        
-        // Build arrays for labels and data
-        const labels = sensorData.map(entry =>
-          new Date(entry.timestamp).toLocaleTimeString()
-        );
-        const temperatures = sensorData.map(entry => entry.temperature);
-        
-        // Update chart data
-        temperatureChart.data.labels = labels;
-        temperatureChart.data.datasets[0].data = temperatures;
-        temperatureChart.update();
-      } catch (error) {
-        console.error("Error fetching sensor data:", error);
-      }
-    }
-    
-    // Initialize chart when the page loads
-    createChart();
-    // Poll the API every 5 seconds
-    setInterval(updateChartData, 5000);
-  </script>
+  <div class="top-bar">
+    <a href="login.html"><button class="login-btn">Login</button></a>
+  </div>
+  <main style="padding:2em;">
+    <h1>Welcome to Water Quality Dashboard</h1>
+    <p>Monitor your sensor data securely and efficiently.</p>
+  </main>
 </body>
 </html>
-
