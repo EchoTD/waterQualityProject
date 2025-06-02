@@ -16,3 +16,9 @@ mqtt:
   broker-url: tcp://mosquitto:1883
   client-id: spring-mqtt-server
   topic: sensors/#
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
