@@ -38,7 +38,7 @@ services:
     image: eclipse-mosquitto:2.0.15
     container_name: waterquality-mosquitto
     ports:
-      - "1883"
+      - "1883:1883"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - mosquitto-data:/mosquitto/data
