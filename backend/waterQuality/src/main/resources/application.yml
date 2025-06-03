@@ -25,3 +25,5 @@ management:
   endpoint:
     health:
       show-details: always
+jwt:
+    secret: ${JWT_SECRET:t4rCUBeZ4T9AxviMJv86xxtJk1M6mouSEpoAaLRKzXo=}

@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: waterquality-backend
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     env_file: .env
     environment:
       TZ: "Europe/Istanbul"
@@ -13,9 +13,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
       MQTT_BROKER_URL: tcp://mosquitto:1883
-    volumes:
-      - ./backend/waterQuality/src:/app/src
-      - ./backend/waterQuality/pom.xml:/app/pom.xml
+        #volumes:
+      # - ./backend/waterQuality/src:/app/src
+      #- ./backend/waterQuality/pom.xml:/app/pom.xml
     depends_on:
       - postgres
       - mosquitto
@@ -38,7 +38,7 @@ services:
     image: eclipse-mosquitto:2.0.15
     container_name: waterquality-mosquitto
     ports:
-      - "1883:1883"
+      - "1883"
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - mosquitto-data:/mosquitto/data
