@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/waterquality
-    username: postgres
-    password: password
+    url: jdbc:postgresql://${DB_HOST:waterquality-postgres}:5432/${DB_NAME:waterquality}
+    username: ${DB_USER} 
+    password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: update
