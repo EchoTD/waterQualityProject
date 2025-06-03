@@ -22,8 +22,8 @@ FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-+ARG JAR_FILE=target/*.jar
-+COPY --from=build /app/${JAR_FILE} app.jar
+ARG JAR_FILE=target/*.jar
+COPY --from=build /app/${JAR_FILE} app.jar
 
 # Expose the port used by your Spring Boot application
 EXPOSE 8080
