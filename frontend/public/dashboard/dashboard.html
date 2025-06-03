@@ -2,116 +2,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Dashboard — Water Quality App</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: sans-serif; padding: 2em; }
-    .logout-btn {
-      float: right;
-      background: #cc0033;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.6em 1.2em;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    .chart-container {
-      position: relative;
-      margin-top: 2em;
-      width: 100%;
-      max-width: 800px;
-    }
-    h1, h2 {
+    /* Page background */
+    body {
       margin: 0;
+      background-color: #e6f7ff; /* light blue */
+      font-family: Arial, sans-serif;
+    }
+
+    /* Top bar */
+    .header {
+      background-color: #f0f0f0; /* light gray */
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .header .title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .header .buttons button {
+      margin-left: 12px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      background-color: #1890ff;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .header .buttons button:hover {
+      background-color: #1073c7;
+    }
+
+    /* Main content area */
+    .main {
+      display: flex;
+      padding: 24px;
+      box-sizing: border-box;
+      height: calc(100vh - 50px);
+      overflow: hidden; /* prevent page from scrolling itself */
+    }
+
+    /* Chart on the left */
+    .chart-container {
+      flex: 3;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      padding: 16px;
+      margin-right: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-container h2 {
+      margin: 0 0 8px 0;
+      font-size: 1rem;
+      color: #333;
+    }
+    .chart-container canvas {
+      flex: 1;
+    }
+
+    /* Slider on the right */
+    .slider-container {
+      flex: 1;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .slider-container h3 {
+      margin-bottom: 12px;
+      font-size: 1rem;
+      color: #333;
+      text-align: center;
+    }
+    .slider-container input[type=range] {
+      width: 100%;
+    }
+    .slider-container #timeLabel {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #555;
     }
   </style>
-  <!-- Chart.js CDN -->
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="header">
+    <div class="title">Dashboard</div>
+    <div class="buttons">
+      <button onclick="location.href='index.html'">Home</button>
+      <button id="logoutBtn">Çıkış</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <!-- Left: Chart -->
+    <div class="chart-container">
+      <h2>Sıcaklık Grafiği</h2>
+      <canvas id="tempChart"></canvas>
+    </div>
+
+    <!-- Right: Slider -->
+    <div class="slider-container">
+      <h3>Zaman Aralığı Seçimi</h3>
+      <input type="range" id="timeSlider" min="0" max="4" value="0" />
+      <div id="timeLabel">Last 10 minutes</div>
+    </div>
+  </div>
+
   <script>
-  // 1) Redirect to login if no token
-  const token = localStorage.getItem('token');
-  if (!token) location.href = 'dashboard/login.html';
+    // Redirect to login if no token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = 'dashboard/login.html';
+    }
 
-  // 2) Prepare a Chart.js instance with initially empty data
-  const ctx = document.getElementById('tempChart').getContext('2d');
-  const tempChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [],      // x-axis timestamps
-      datasets: [{
-        label: 'Temperature (°C)',
-        data: [],      // y-axis values
-        fill: false,
-        tension: 0.1
-      }]
-    },
-    options: {
-      scales: {
-        x: {
-          display: true,
-          title: { display: true, text: 'Timestamp' }
-        },
-        y: {
-          display: true,
-          title: { display: true, text: 'Temperature (°C)' }
+    // Slider labels
+    const timeLabels = [
+      'Son 10 dakika',
+      'Son 30 dakika',
+      'Son 2 saat',
+      'Son 1 gün',
+      'Son 1 hafta'
+    ];
+    const timeSlider = document.getElementById('timeSlider');
+    const timeLabelDiv = document.getElementById('timeLabel');
+
+    timeSlider.addEventListener('input', () => {
+      timeLabelDiv.textContent = timeLabels[timeSlider.value];
+      // Re-draw chart whenever slider moves
+      drawChart();
+    });
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = 'dashboard/login.html';
+    });
+
+    // Create Chart.js instance
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    const tempChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: [],
+          borderColor: '#FF6B6B',
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            display: true,
+          },
+          y: {
+            display: true,
+            title: { display: true, text: '°C' },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    let fullData = [];
+
+    // Fetch full sensor history
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/sensor-data', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('Fetch error');
+        const data = await res.json();
+
+        // Filter to temperature readings and sort by timestamp
+        fullData = data
+          .filter(pt => pt.type === 'temperature')
+          .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+        // Draw chart initially (and on each fetch)
+        drawChart();
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        if (err.message.includes('Unauthorized')) {
+          localStorage.removeItem('token');
+          window.location.href = 'dashboard/login.html';
         }
       }
     }
-  });
 
-  // 3) Define a function to fetch the latest data and update the chart
-  async function fetchAndAppendTemperature() {
-    try {
-      const res = await fetch('/api/sensor-data', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      if (!res.ok) throw new Error('Unauthorized or network error');
-      const data = await res.json();
+    // Draw chart based on current slider position
+    function drawChart() {
+      const idx = parseInt(timeSlider.value, 10);
+      const now = Date.now();
+      const minutesLookup = [10, 30, 120, 1440, 10080];
+      const cutoff = now - minutesLookup[idx] * 60 * 1000;
 
-      // Assume "data" is an array of objects like:
-      // [{ timestamp: "2025-06-03T12:00:00Z", temperature: 22.5 }, ...]
-      // We’ll take only the newest point:
-      if (Array.isArray(data) && data.length > 0) {
-        // Sort by timestamp ascending, just in case:
-        data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        const latest = data[data.length - 1];
+      const filtered = fullData.filter(
+        pt => new Date(pt.timestamp).getTime() >= cutoff
+      );
 
-        // Convert timestamp to a human‐readable string
-        const timeLabel = new Date(latest.timestamp).toLocaleString();
-
-        // Push into chart data:
-        tempChart.data.labels.push(timeLabel);
-        tempChart.data.datasets[0].data.push(latest.temperature);
-
-        // If you only want to keep the last N points (e.g. 20), shift off older
-        if (tempChart.data.labels.length > 40) {
-          tempChart.data.labels.shift();
-          tempChart.data.datasets[0].data.shift();
-        }
-
-        // Finally, tell Chart.js to redraw
-        tempChart.update();
-      }
-    } catch (err) {
-      console.error('Failed to fetch sensor-data:', err);
-      if (err.message.includes('Unauthorized')) {
-        localStorage.removeItem('token');
-        location.href = '/dashboard/login.html';
-      }
+      tempChart.data.labels = filtered.map(pt =>
+        new Date(pt.timestamp).toLocaleTimeString()
+      );
+      tempChart.data.datasets[0].data = filtered.map(pt => pt.temperature);
+      tempChart.update();
     }
-  }
 
-  // 4) Call it once immediately, then every 5 seconds
-  fetchAndAppendTemperature();
-  setInterval(fetchAndAppendTemperature, 5000);
-
-  // 5) Logout handler
-  document.getElementById('logout').addEventListener('click', () => {
-    localStorage.removeItem('token');
-    location.href = '/dashboard/login.html';
-  });
-</script>
+    // Initial data load & polling
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
 </body>
 </html>
-
-
