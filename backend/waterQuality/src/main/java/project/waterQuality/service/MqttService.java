@@ -3,6 +3,7 @@ package project.waterQuality.service;
 import java.time.LocalDateTime;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,10 @@ import project.waterQuality.repository.SensorRepository;
 public class MqttService {
 	@Value("${mqtt.broker-url}")
 	private String brokerUrl;
-
+	@Value("${mqtt.username}")
+	private String mqttUser;
+	@Value("${mqtt.password}")
+	private String mqttPass;
 	private MqttClient client;
 
 	private final SensorRepository repository;
@@ -30,7 +34,10 @@ public class MqttService {
 	@PostConstruct
 	public void init() throws MqttException {
 		client = new MqttClient(brokerUrl, MqttClient.generateClientId());
-		client.connect();
+		MqttConnectOptions options = new MqttConnectOptions();
+		options.setUserName(mqttUser);
+		options.setPassword(mqttPass.toCharArray());
+		client.connect(options);
 		client.subscribe("sensors/#", this::handleMessage);
 	}
 

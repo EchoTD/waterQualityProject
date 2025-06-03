@@ -12,6 +12,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+      MQTT_USER: ${MQTT_USER}
+      MQTT_PASS: ${MQTT_PASS}
       MQTT_BROKER_URL: tcp://mosquitto:1883
         #volumes:
       # - ./backend/waterQuality/src:/app/src
