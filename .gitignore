@@ -2,3 +2,4 @@
 *.db
 *.log
 mosquitto/config/passwordfile
+embedded/esp32Receiver/extra_secrets.ini
