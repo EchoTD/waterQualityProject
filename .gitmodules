@@ -1,12 +1,16 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/EchoTD/waterQuality-backend.git
+	branch = main
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/Erenerten/waterQualityFrontend.git
+	branch = main
 [submodule "embedded"]
 	path = embedded
 	url = https://github.com/EchoTD/waterQuality-embedded.git
+	branch = main
 [submodule "mosquitto"]
 	path = mosquitto
 	url = https://github.com/EchoTD/waterQuality-mosquitto.git
+	branch = main
